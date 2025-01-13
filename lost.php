@@ -1,5 +1,52 @@
 <?php 
-    $img = "img_avatar1.png";
+
+    include 'Lost_object.php';
+    $server = "localhost";
+    $user = "root";
+    $psswrd = "";
+    $DB = "lostAndFoundDB"; 
+    
+    $conn = connect_DB($server, $user, $psswrd, $DB);
+    if ($conn != NULL){
+        $sql = create_select_query ();
+        $result = $conn->query($sql);
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                foreach ($row as $field => $value) {
+                    echo "$field: $value<br>";
+                }
+                echo "<hr>";
+            }
+        } else {
+            echo "No se encontraron resultados.";
+        }
+    }
+    
+    close_connection($conn);
+
+    function connect_DB($server, $user, $psswrd, $DB){
+        $conn = new mysqli($server, $user, $psswrd, $DB);
+
+        if ($conn->connect_error) {
+            return null;
+            die("Error en la conexión: " . $conn->connect_error);
+        }
+        else{
+            echo "Conexión exitosa a la base de datos '$DB'.";
+            return $conn;
+        }
+    }
+
+    function close_connection($conn){
+        $conn->close();
+    }
+
+    function create_select_query (){
+        $query = "SELECT * FROM lost_object";
+        return $query;
+     }
+   
+   $img = "img_avatar1.png";
     $caption = "Esto es un texto de ejemplo";
 
     function print_obj_cart($img, $caption){

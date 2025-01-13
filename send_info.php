@@ -18,7 +18,7 @@
           }
   
           if (move_uploaded_file($_FILES['picture']['tmp_name'], $path)) {
-                save_info($img, $caption, $initial_location, $final_location, $date, $path, $fileName);
+                save_info($caption, $initial_location, $final_location, $date, $path, $fileName);
           } else {
               echo "Hubo un problema al subir la imagen.";
           }
@@ -45,8 +45,14 @@
         echo "Ubicación final: " . $final_location . "<br>";
         echo "Fecha en que se encontró: " . $date . "<br>";
         echo "Imagen subida correctamente: <a href='$$path'>$fileName</a>";
-  
-    close_connection($conn);
+        $found = false;
+        $sql = create_insert_query ($caption, $initial_location, $final_location, found, $date, $path, $fileName);
+        if ($conn->query($sql) === TRUE) {
+            echo "<br>SE HA INSERTADO LA INFORMACIÓN CON ÉXITO";
+        } else {
+            echo "Error al crear la tabla: " . $conn->error;
+        }
+        close_connection($conn);
     }
     
 }
@@ -59,7 +65,7 @@
         die("Error en la conexión: " . $conn->connect_error);
     }
     else{
-        echo "Conexión exitosa a la base de datos '$baseDatos'.";
+        echo "Conexión exitosa a la base de datos '$DB'.";
         return $conn;
     }
   }
@@ -68,8 +74,10 @@
     $conn->close();
   }
 
-  function create_insert_query ($caption, $initial_location, $final_location, $date, $path, $fileName){
-    $query = "INSERT INTO lost_object (caption, initial_location, final_location, found, found_date, img_path, file_name) VALUES ('[value-2]','[value-3]','[value-4]','[value-5]','[value-6]','[value-7]','[value-8]'
-       );";
-  }
+  function create_insert_query ($caption, $initial_location, $final_location, &found, $date, $path, $fileName){
+    $query = "INSERT INTO lost_object (caption, initial_location, final_location, found, found_date, img_path, file_name)";
+    $query .= "VALUES ('$caption','$initial_location','$final_location', $found, '$date','$path','$fileName');";
+    echo "<br> <strong> $query </strong>";
+    return $query;
+ }
   ?>
